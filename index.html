@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>نظام التنظيف الأهلية</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -207,17 +208,21 @@ function tbl_wrap(html){return`<div style="overflow-x:auto">${html}</div>`;}
 
 // ═══════════════════════ AUTH ═══════════════════════
 function doLogin(){
-  const u=document.getElementById('l-u').value.trim();
-  const p=document.getElementById('l-p').value;
-  const user=users.find(x=>x.username===u&&x.password===p&&x.active);
-  if(!user){const e=document.getElementById('l-err');e.textContent='اسم المستخدم أو كلمة المرور غير صحيحة';e.style.display='block';return;}
+  const u=(document.getElementById('l-u').value||'').trim();
+  const p=(document.getElementById('l-p').value||'');
+  // تأكد إن users موجود
+  if(!users||!users.length){users=[{id:1,username:'admin',password:'admin123',role:'manager',name:'المدير',active:true},{id:2,username:'collector',password:'col123',role:'collector',name:'المستحصل',active:true}];lset(K.users,users);}
+  const user=users.find(function(x){return x.username===u&&x.password===p&&x.active;});
+  const err=document.getElementById('l-err');
+  if(!user){err.textContent='اسم المستخدم أو كلمة المرور غير صحيحة';err.style.display='block';return;}
+  err.style.display='none';
   CU=user;
   document.getElementById('login-view').style.display='none';
   document.getElementById('app-view').style.display='block';
   document.getElementById('app-logo').textContent='🧹 '+cfg.name;
   document.getElementById('app-dt').textContent=new Date().toLocaleDateString('ar-IQ');
   const ub=document.getElementById('user-badge');
-  ub.textContent=(CU.role==='manager'?'👑 مدير':'💰 مستحصل')+' — '+CU.name;
+  ub.textContent=(CU.role==='manager'?'مدير':'مستحصل')+' — '+CU.name;
   ub.className='badge '+(CU.role==='manager'?'b-purple':'b-green');
   buildApp();
 }
